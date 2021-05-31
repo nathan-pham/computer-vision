@@ -3,7 +3,7 @@ import cv2
 
 import time
 
-camera = cv2.VideoCapture("videos/girl-dancing.mp4")
+camera = cv2.VideoCapture("videos/girl-dancing-smaller.mp4")
 window_name = "pose estimation"
 
 # initialize window
@@ -36,6 +36,7 @@ def resize_aspect(img, width=None, height=None):
 while cv2.getWindowProperty(window_name, 0) >= 0:
     success, img = camera.read()
     resized_img = resize_aspect(img=img, height=400)
+    height, width = resized_img.shape[:2]
 
     # get results
     img_rgb = cv2.cvtColor(resized_img, cv2.COLOR_BGR2RGB)
@@ -43,6 +44,11 @@ while cv2.getWindowProperty(window_name, 0) >= 0:
 
     if results.pose_landmarks:
         draw.draw_landmarks(resized_img, results.pose_landmarks, model.POSE_CONNECTIONS)
+
+        for id, landmark in enumerate(results.pose_landmarks.landmark):
+            cx, cy = int(landmark.x * width), int(landmark.y * height)
+            if id == 0:
+                cv2.circle(resized_img, (cx, cy), 10, (255, 0, 255), cv2.FILLED)
 
     # get & render fps
     current_time = time.time()
