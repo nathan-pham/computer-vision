@@ -3,12 +3,17 @@ import cv2
 
 import time
 
-camera = cv2.VideoCapture("videos/people-walking.mp4")
+camera = cv2.VideoCapture("videos/person-walking.mp4")
 window_name = "pose estimation"
 
 # initialize window
 cv2.namedWindow(window_name)
 cv2.startWindowThread()
+
+# initialize models
+draw = mp.solutions.drawing_utils
+model = mp.solutions.pose
+pose = model.Pose()
 
 previous_time = 0
 current_time = 0
@@ -31,6 +36,13 @@ def resize_aspect(img, width=None, height=None):
 while cv2.getWindowProperty(window_name, 0) >= 0:
     success, img = camera.read()
     resized_img = resize_aspect(img=img, height=400)
+
+    # get results
+    img_rgb = cv2.cvtColor(resized_img, cv2.COLOR_BGR2RGB)
+    results = pose.process(img_rgb)
+
+    if results.pose_landmarks:
+        draw.draw_landmarks(resized_img, results.pose_landmarks)
 
     # get & render fps
     current_time = time.time()
