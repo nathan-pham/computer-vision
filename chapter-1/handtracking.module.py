@@ -17,27 +17,31 @@ class HandTracker():
         cv2.startWindowThread()
 
     def find_hands(self, img, draw=True, fps=0):
-        img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        results = self.hands.process(img_rgb)
-
-        height, width, channels = img.shape
+        results = self.hands.process(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+        hands = results.multi_hand_landmarks or []
 
         if draw:
-            for hand in results.multi_hand_landmarks or []:
+            for hand in hands:
                 self.draw.draw_landmarks(img, hand, self.model.HAND_CONNECTIONS)
 
-        if fps > 0:
-            cv2.putText(img, "fps: " + str(fps), (10, 20), cv2.FONT_HERSHEY_PLAIN, 1, (255, 0, 255), 1)
+            if fps > 0:
+                cv2.putText(img, "fps: " + str(fps), (10, 20), cv2.FONT_HERSHEY_PLAIN, 1, (255, 0, 255), 1)
 
-        return img
+        return hands
 
-    def find_position(self, img, node_id=0, draw=True):
-        # for id, landmark in enumerate(hand.landmark):
-        #     cx = int(landmark.x * width)
-        #     cy = int(landmark.y * height)
+    def find_position(self, img, hand, draw=True):
+        height, width, channels = img.shape
+        landmark_list = []
 
-        #     if id == 0:
-        #         cv2.circle(img, (cx, cy), 5, (255, 0, 255), cv2.FILLED)
+        for id, landmark in enumerate(hand.landmark):
+            cx = int(landmark.x * width)
+            cy = int(landmark.y * height)
+            landmark_list.append([id, cx, cy])
+            
+            if draw:
+                cv2.circle(img, (cx, cy), 10, (255, 0, 255), cv2.FILLED)
+    
+        return landmark_list
 
 def main():
     hand_tracker = HandTracker("hand-tracker")
@@ -48,14 +52,18 @@ def main():
 
     while cv2.getWindowProperty(hand_tracker.window_name, 0) >= 0:
         success, img = hand_tracker.camera.read()
-        
+
         current_time = time.time()
         fps = int(1 / (current_time - previous_time))
         previous_time = current_time
 
-        detection_img = hand_tracker.find_hands(img, True, fps)
-        cv2.imshow(hand_tracker.window_name, detection_img)
-        key_code = cv2.waitKey(50)
+        hands = hand_tracker.find_hands(img, True, fps)
+        
+        if len(hands) > 0:
+            landmark_list = hand_tracker.find_position(img, hands[0])
+
+        cv2.imshow(hand_tracker.window_name, img)
+        cv2.waitKey(50)
     
 if __name__ == "__main__":
     main()
