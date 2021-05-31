@@ -21,8 +21,17 @@ while cv2.getWindowProperty(window_name, 0) >= 0:
     img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     results = hands.process(img_rgb)
 
-    for landmark in results.multi_hand_landmarks or []:
-        draw.draw_landmarks(img, landmark, model.HAND_CONNECTIONS)
+    height, width, channels = img.shape
+
+    for hand in results.multi_hand_landmarks or []:
+        draw.draw_landmarks(img, hand, model.HAND_CONNECTIONS)
+
+        for id, landmark in enumerate(hand.landmark):
+            cx = int(landmark.x * width)
+            cy = int(landmark.y * height)
+
+            if id == 0:
+                cv2.circle(img, (cx, cy), 5, (255, 0, 255), cv2.FILLED)
 
     current_time = time.time()
     fps = int(1 / (current_time - previous_time))
