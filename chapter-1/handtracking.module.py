@@ -4,7 +4,7 @@ import cv2
 import time
     
 class HandTracker():
-    def __init__(self, window_name="hand-tracker", mode=False, max_hands=2, detection_confidence=0.5, track_confidence=0.5):
+    def __init__(self, window_name="hand tracking", mode=False, max_hands=2, detection_confidence=0.5, track_confidence=0.5):
         self.window_name = window_name
         self.draw = mp.solutions.drawing_utils
         self.model = mp.solutions.hands
@@ -44,7 +44,7 @@ class HandTracker():
         return landmark_list
 
 def main():
-    hand_tracker = HandTracker("hand-tracker")
+    hand_tracker = HandTracker()
     previous_time = 0
     current_time = 0
 
