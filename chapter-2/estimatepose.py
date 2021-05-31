@@ -3,7 +3,7 @@ import cv2
 
 import time
 
-camera = cv2.VideoCapture("videos/person-walking.mp4")
+camera = cv2.VideoCapture("videos/girl-dancing.mp4")
 window_name = "pose estimation"
 
 # initialize window
@@ -42,7 +42,7 @@ while cv2.getWindowProperty(window_name, 0) >= 0:
     results = pose.process(img_rgb)
 
     if results.pose_landmarks:
-        draw.draw_landmarks(resized_img, results.pose_landmarks)
+        draw.draw_landmarks(resized_img, results.pose_landmarks, model.POSE_CONNECTIONS)
 
     # get & render fps
     current_time = time.time()
