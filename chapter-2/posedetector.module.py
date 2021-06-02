@@ -38,15 +38,26 @@ class PoseDetector():
 
         img_rgb = cv2.cvtColor(resized_img, cv2.COLOR_BGR2RGB)
         results = self.pose.process(img_rgb)
-        landmarks = results.pose_landmarks or []
+        landmarks = results.pose_landmarks
         
-        if len(landmarks) > 0 and draw:
+        if landmarks and draw:
             self.draw.draw_landmarks(resized_img, landmarks, self.model.POSE_CONNECTIONS)
 
         return landmarks
-        
-    def find_position():
-        pass
+
+    def find_position(self, img, pose, draw=True):
+        height, width = img.shape[:2]
+        landmark_list = []
+
+        if pose:
+            for id, landmark in enumerate(pose.landmark):
+                cx, cy = int(landmark.x * width), int(landmark.y * height)
+                landmark_list.append([id, cx, cy])
+                if draw:
+                    cv2.circle(img, (cx, cy), 10, (255, 0, 255), cv2.FILLED)
+
+        return landmark_list
+
 def main():
     pose_detector = PoseDetector()
     capture = pose_detector.create_capture("pose detection", 0)
