@@ -43,7 +43,7 @@ class PoseDetector():
         if landmarks and draw:
             self.draw.draw_landmarks(resized_img, landmarks, self.model.POSE_CONNECTIONS)
 
-        return landmarks
+        return resized_img, landmarks
 
     def find_position(self, img, pose, draw=True):
         height, width = img.shape[:2]
@@ -56,7 +56,7 @@ class PoseDetector():
                 if draw:
                     cv2.circle(img, (cx, cy), 10, (255, 0, 255), cv2.FILLED)
 
-        return landmark_list
+        return img, landmark_list
 
 def main():
     pose_detector = PoseDetector()
@@ -66,22 +66,25 @@ def main():
     current_time = 0
 
     while True:
-    if results.pose_landmarks:
-        draw.draw_landmarks(resized_img, results.pose_landmarks, model.POSE_CONNECTIONS)
+        _, img = capture.read()
+        
+        img, pose = pose_detector.find_pose(img)
+        img, landmark_list = pose_detector.find_position(img, pose)
 
-        # for id, landmark in enumerate(results.pose_landmarks.landmark):
-        #     cx, cy = int(landmark.x * width), int(landmark.y * height)
-        #     if id == 0:
-        #         cv2.circle(resized_img, (cx, cy), 10, (255, 0, 255), cv2.FILLED)
+        current_time = time.time()
+        fps = int(1 / (current_time - previous_time))
+        previous_time = current_time
 
-    # get & render fps
-    current_time = time.time()
-    fps = int(1 / (current_time - previous_time))
-    previous_time = current_time
-    cv2.putText(resized_img, "fps: " + str(fps), (10, 20), cv2.FONT_HERSHEY_PLAIN, 1, (255, 0, 255), 1)
 
-    cv2.imshow(window_name, resized_img)
-    key_code = cv2.waitKey(50)
+        cv2.putText(img, "fps: " + str(fps), (10, 20), cv2.FONT_HERSHEY_PLAIN, 1, (255, 0, 255), 1)
+        cv2.imshow("pose detection", img)
+        
+        key_code = cv2.waitKey(30)
+        if key_code == 27:
+            break
+
+    capture.release()
+    cv2.destroyAllWindows()
 
 if __name__ == "__main__":
     main()
