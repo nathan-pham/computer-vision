@@ -7,7 +7,7 @@ class PoseDetector():
     def __init__(self, mode=False, upper_body=False, smooth_landmarks=True, detection_confidence=0.5, tracking_confidence=0.5):
         self.draw = mp.solutions.drawing_utils
         self.model = mp.solutions.pose
-        self.pose = model.Pose(mode, upper_body, smooth_landmarks, detection_confidence, tracking_confidence)
+        self.pose = self.model.Pose(mode, upper_body, smooth_landmarks, detection_confidence, tracking_confidence)
         self.started = False
 
     def create_capture(self, source):
@@ -18,6 +18,9 @@ class PoseDetector():
             self.started = True
 
         return capture
+
+    def flip_source(self, img, code):
+        return cv2.flip(img, code)
 
     def resize_source(self, img, width=None, height=None):
         (h, w) = img.shape[:2]
@@ -60,7 +63,7 @@ class PoseDetector():
 
 def main():
     pose_detector = PoseDetector()
-    capture = pose_detector.create_capture("pose detection", 0)
+    capture = pose_detector.create_capture(0)
     
     previous_time = 0
     current_time = 0
@@ -76,6 +79,7 @@ def main():
         previous_time = current_time
 
 
+        img = pose_detector.flip_source(img, 1)
         cv2.putText(img, "fps: " + str(fps), (10, 20), cv2.FONT_HERSHEY_PLAIN, 1, (255, 0, 255), 1)
         cv2.imshow("pose detection", img)
         
