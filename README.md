@@ -5,3 +5,4 @@ Notes adapted from https://www.youtube.com/watch?v=01sAkU_NvOY
 ## Chapters
 chapter 1: hand tracking  
 chapter 2: pose estimation  
+chapter 3: face detection  
