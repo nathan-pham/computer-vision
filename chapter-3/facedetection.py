@@ -27,7 +27,7 @@ while True:
                 int(_bbox.width * width), int(_bbox.height * height)) 
 
         cv2.rectangle(frame, bbox, (255, 0, 255), 2)
-        cv2.putText(frame, f"detection_score: {int(detection.score[0])}", (10, 40), cv2.FONT_HERSHEY_PLAIN, 1, (255, 0, 255), 1)
+        cv2.putText(frame, f"detection_score: {int(detection.score[0] * 100)}%", (bbox[0], bbox[1] - 20), cv2.FONT_HERSHEY_PLAIN, 1, (255, 0, 255), 1)
 
     current_time = time.time()
     fps = int(1 / (current_time - previous_time))
